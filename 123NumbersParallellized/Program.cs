@@ -3,50 +3,79 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace _123Numbers
+namespace Numbers123Parallellized
 {
     class Program
     {
         static void Main(string[] args)
         {
             long n = 1;
-            var i = "1".ToArray();
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            var oldn = n;
-            var countSiffer = i.Length;
-            var watch2 = System.Diagnostics.Stopwatch.StartNew();
-        
-            while (n <= 1000001)
+            Task<long>[] taskArray = new Task<long>[25];
+            var testers = new Is123NumberClass[25];
+            for (int i = 0; i < taskArray.Length; i++)
             {
-                if (Is123Number(i))
+                testers[i] = new Is123NumberClass(i+1);
+            }
+                
+            for (int i = 0; i < taskArray.Length; i++)
+            {
+                var tester = testers[i];
+                taskArray[i] = Task.Factory.StartNew(() =>
+                                                   {                                                       
+                                                       return tester.FindNForArray();
+                                                   }
+                                                    );
+            }
+            Task.WaitAll(taskArray);
+            foreach (var task in taskArray)
+            {
+                var t = task.Result;
+                //Debugger.Break();
+            }
+        }
+
+        
+    }
+
+    public class Is123NumberClass
+    {
+        private char[] _stringArray;
+        public Is123NumberClass(int length)
+        {
+            _stringArray = new string('1', length).ToArray();
+        }
+
+        
+
+        public long FindNForArray()
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            long n = 0;
+
+            var countSiffer = _stringArray.Length;
+            while (n <= 60000000)
+            {
+                if (countSiffer < _stringArray.Length)
                 {
-                    if (n % 100000 == 0 || n==6000)
-                    {
-                        watch.Stop();
-                        Console.WriteLine($"f({n}) = {new string(i)}  {watch.ElapsedMilliseconds}");
-                        watch = System.Diagnostics.Stopwatch.StartNew();
-                    }
-                    //if(countSiffer < i.Length)
-                    //{
-                    //    Console.WriteLine($"f({n}) = {new string(i)}  {watch.ElapsedMilliseconds}  Antall siffer: {countSiffer} Antall n{n-oldn}");
-                    //    oldn = n;
-                    //    countSiffer = i.Length;
-                    //    watch = System.Diagnostics.Stopwatch.StartNew();
-                    //}
+                    Console.WriteLine($"i: {new string(_stringArray)}. Tid brukt: {watch.ElapsedMilliseconds}  Antall siffer: {countSiffer} Antall n; {n }");
+                    return n;
+                }
+
+                if (Is123Number(_stringArray))
+                {
                     n++;
                 }
                 //Console.WriteLine($"f({n}) = {i}, {i%11}, {i % 12}, {i % 13}, {i % 21}, {i % 22}, {i % 23}, {i % 31}, {i % 32}, {i % 33}");
-                i = CalculateNextI(i);
+                _stringArray = CalculateNextI(_stringArray);
             }
-            watch2.Stop();
-            Console.WriteLine($"f({n}) = {new string(i)}  {watch2.ElapsedMilliseconds}");
-            //Debugger.Break();
+            return n;
         }
 
         private static char[] CalculateNextI(char[] number)
         {
-            if (number[number.Length-1] == '3')
+            if (number[number.Length - 1] == '3')
             {
                 var stringBuilder = new StringBuilder();
                 var allThrees = true;
@@ -84,11 +113,7 @@ namespace _123Numbers
 
                 return number;
             }
-
-
-
         }
-
         public static string Reverse(string s)
         {
             char[] charArray = s.ToCharArray();
@@ -116,40 +141,5 @@ namespace _123Numbers
         {
             return (new List<string> { "0", "1", "2", "3" }.Contains(count) || Is123Number(count.ToCharArray()));
         }
-
-        static int NumberOfSolutions(int x, int y, int z, int n)
-        {
-            // to store answer 
-            int ans = 0;
-
-            // for values of x 
-            for (int i = 0; i <= x; i++)
-            {
-
-                // for values of y 
-                for (int j = 0; j <= y; j++)
-                {
-
-                    // maximum possible value of z 
-                    int temp = n - i - j;
-
-                    // if z value greater than equals to 0 
-                    // then only it is valid 
-                    if (temp >= 0)
-                    {
-
-                        // find minimum of temp and z 
-                        temp = Math.Min(temp, z);
-                        ans += temp + 1;
-                    }
-                }
-            }
-
-            // return required answer 
-            return ans;
-        }
     }
 }
-
-
-
