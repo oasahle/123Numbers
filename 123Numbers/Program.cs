@@ -13,14 +13,23 @@ namespace _123Numbers
             long n = 1;
             var i = "1".ToArray();
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            while (n <= 111111111111222333)
+            var oldn = n;
+            var countSiffer = i.Length;
+            while (n <= 60000000)
             {
                 if (Is123Number(i))
                 {
-                    if (n % 1000000 == 0)
+                    //if (n % 10 == 0)
+                    //{
+                    //    watch.Stop();
+                    //    Console.WriteLine($"f({n}) = {new string(i)}  {watch.ElapsedMilliseconds}");
+                    //    watch = System.Diagnostics.Stopwatch.StartNew();
+                    //}
+                    if(countSiffer < i.Length)
                     {
-                        watch.Stop();
-                        Console.WriteLine($"f({n}) = {new string(i)}  {watch.ElapsedMilliseconds}");
+                        Console.WriteLine($"f({n}) = {new string(i)}  {watch.ElapsedMilliseconds}  Antall siffer: {countSiffer} Antall n{n-oldn}");
+                        oldn = n;
+                        countSiffer = i.Length;
                         watch = System.Diagnostics.Stopwatch.StartNew();
                     }
                      n++;
